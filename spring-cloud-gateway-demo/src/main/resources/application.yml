@@ -1,0 +1,48 @@
+#server:
+#  port: 9098
+
+spring:
+  application:
+    name: gateway
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test
+    username: sa
+    password: sa
+
+  h2:
+    console:
+      enabled: true
+
+
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    healthcheck:
+      enabled: true
+    lease:
+      duration: 5
+
+
+zuul:
+  prefix: /gateway
+  routes:
+    client-service:
+#      path: /client/*     # /client/* ���� /client/ �����һ��Ŀ¼
+      path: /client/**     # /client/** ���� /client/ ���������Ŀ¼
+      serviceId: spring-cloud-client
+  ratelimit:
+    enabled: true
+    repository: JPA
+    policy-list:
+      client-service:
+        - limit: 3
+          refresh-interval: 30
+          type:
+            - origin
